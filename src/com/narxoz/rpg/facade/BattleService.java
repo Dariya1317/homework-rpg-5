@@ -3,7 +3,6 @@ package com.narxoz.rpg.facade;
 import com.narxoz.rpg.decorator.AttackAction;
 import com.narxoz.rpg.enemy.BossEnemy;
 import com.narxoz.rpg.hero.HeroProfile;
-
 import java.util.Random;
 
 public class BattleService {
@@ -15,23 +14,41 @@ public class BattleService {
     }
 
     public AdventureResult battle(HeroProfile hero, BossEnemy boss, AttackAction action) {
-        // TODO: Implement the battle flow.
-        // Questions to answer:
-        // - Who attacks first?
-        // - How many rounds are allowed?
-        // - How is damage resolved?
-        // - How will randomness affect the result, if at all?
         AdventureResult result = new AdventureResult();
-        result.setWinner("TODO");
-        result.setRounds(0);
-        result.setReward("TODO");
-        result.addLine("TODO: implement battle logic");
+        int round = 0;
+        int maxRounds = 10;
 
-        // Keep the field in use so students can decide whether to rely on it.
-        if (random.nextInt(1) == 0) {
-            // TODO: Replace placeholder branch with real deterministic or random logic.
+        result.addLine("Battle Starts: " + hero.getName() + " vs " + boss.getName());
+
+        while (hero.isAlive() && boss.isAlive() && round < maxRounds) {
+            round++;
+            result.addLine("Round " + round + ":");
+            int heroDamage = action.getDamage();
+            boss.takeDamage(heroDamage);
+            result.addLine("  > " + hero.getName() + " uses " + action.getActionName() + 
+                           " for " + heroDamage + " damage " +
+                           boss.getName() + " HP: " + boss.getHealth());
+            if (!boss.isAlive()) {
+                result.setWinner(hero.getName());
+                result.addLine(boss.getName() + " has been defeated");
+                break;
+            }
+            int bossDamage = boss.getAttackPower();
+            hero.takeDamage(bossDamage);
+            result.addLine("  < " + boss.getName() + " strikes back for " + bossDamage + 
+                           " damage. " + hero.getName() + " HP: " + hero.getHealth());
+            if (!hero.isAlive()) {
+                result.setWinner(boss.getName());
+                result.addLine(hero.getName() + " has fallen in battle");
+                break;
+            }
+        }
+        if (result.getWinner() == null) {
+            result.setWinner("Draw");
+            result.addLine("The battle lasted too long. It's a draw");
         }
 
+        result.setRounds(round);
         return result;
     }
 }
