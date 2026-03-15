@@ -19,7 +19,8 @@ public class HeroProfile {
 
     public void takeDamage(int amount) {
         // TODO: Decide how health should be reduced and clamped.
-        health -= amount;
+        // health -= amount;
+        this.health = Math.max(0, this.health - amount);
     }
 
     public boolean isAlive() {
